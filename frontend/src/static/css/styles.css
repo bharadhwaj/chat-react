@@ -1,0 +1,20 @@
+.strikethrough + label {
+	text-decoration: line-through;
+}
+
+.close-button {
+	cursor: pointer;
+}
+
+#toast-container {
+	top: 10%;
+	left: 41%;
+	right: auto !important;
+	bottom: auto !important;
+}
+
+.chat-card {
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+}
