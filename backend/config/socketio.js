@@ -25,9 +25,10 @@ module.exports = (app, server) => {
 					message : 'Joined room successfully.',
 					roomName : roomName,
 					userName : userName,
-					onlineUsers : clientArray
+					onlineUsers : clientArray,
 				}
 				socket.emit('client:joinRoomSuccess', response)
+				socket.broadcast.to(roomName).emit('client:onlineUsers', clientArray)
 			} else {
 				var response = {
 					status : 'FAILED',
@@ -61,6 +62,7 @@ module.exports = (app, server) => {
 					onlineUsers : clientArray
 				}
 				socket.emit('client:createRoomSuccess', response)
+				socket.broadcast.to(roomName).emit('client:onlineUsers', clientArray)
 			}
 		})
 
@@ -73,14 +75,16 @@ module.exports = (app, server) => {
 		})
 
 		socket.on('server:disconnect', function (session, data) {
+			console.log('DISCONNECT REQUEST')
+			console.log(socket.room, socket.user)
 			var userName = data.user
 			var roomName = data.room
+			delete io.sockets.adapter.rooms[roomName][userName]
 			clientArray = clientArray.filter(user => user !== userName)
-			socket.broadcast.to(roomName).emit('client:userLeft', data)
+			socket.broadcast.to(roomName).emit('client:userLeft', clientArray)
 		})
 
 		socket.on('drawLine', function(data, session ) {
-			//  socket.broadcast.to(room).emit('new fan');
 			if(socket.room) {
 				var room=socket.room;
 				console.log('Room Name is '+room)
