@@ -13,8 +13,8 @@
 	bottom: auto !important;
 }
 
-.chat-card {
+.bottom-stick {
 	position: fixed;
 	bottom: 0;
-	width: 100%;
+	width: inherit;
 }

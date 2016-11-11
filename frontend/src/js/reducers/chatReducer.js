@@ -1,6 +1,7 @@
 export default function reducer(state = { 
 	chat : [ ],
 	username : null,
+	onlineUsers : [ ]
 }, action) {
 	
 	switch(action.type) {
@@ -8,10 +9,16 @@ export default function reducer(state = {
 		case "ADD_THREAD": {
 			return {
 				...state,
-				chat : [action.payload, ...state.chat],
+				chat : [...state.chat, action.payload],
 			}
 		}
 
+		case "CURRENT_ONLINE_USERS": {
+			return {
+				...state,
+				onlineUsers : action.payload,
+			}
+		}
 
 		case "SET_USERNAME": {
 			return {

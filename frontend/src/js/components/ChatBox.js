@@ -17,11 +17,11 @@ class ChatBox extends Component {
 		this.setState({ message: '' })
 	}
 
-	createTodo(event) {
+	emitMessage(event) {
 		event.preventDefault()
 		if (this.state.message.trim()) {
 			console.log('Got From Text Box',this.props.username, this.state.message)
-			socket.emit('server:newMessage', this.props.username, { message : this.state.message, user : this.props.username ,room : 'room1' })
+			socket.emit('server:newMessage', this.props.username, { message : this.state.message, user : this.props.username ,room : 'GENERAL' })
 			this.setState({ message: '' })
 		}
 	}
@@ -33,14 +33,14 @@ class ChatBox extends Component {
 	render() {
 		console.log('THIS PROPS:   ', this.props)
 		return (
-			<div className="row chat-card card-content">
+			<div className="row bottom-stick card-content">
 				<form>
 					<div className="col s11 input-field">
 						<label className="left-align" for="todoText">Enter your message</label>
 						<input value={this.state.message} id="todoText" type="text" className="validate" onChange={this.handleTextChange.bind(this)}/>
 					</div>
 					<div className="col s1">
-						<button class="btn btn-floating btn-large waves-effect waves-light" type="submit" onClick={this.createTodo.bind(this)}>
+						<button class="btn btn-floating btn-large waves-effect waves-light" type="submit" onClick={this.emitMessage.bind(this)}>
 						<i class="material-icons right">send</i>
 						</button>
 					</div>
