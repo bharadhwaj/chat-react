@@ -28,6 +28,7 @@ class Index extends Component {
 
 			socket.on('client:joinRoomSuccess', response => {
 				console.log('Join Success :)', response)
+				this.props.dispatch({ type : 'CURRENT_ONLINE_USERS', payload : response.onlineUsers })
 				this.props.dispatch({ type : 'LOADED' })
 			})
 
@@ -42,24 +43,18 @@ class Index extends Component {
 
 			socket.on('client:createRoomSuccess', response => {
 				console.log('Create Success :)', response)
+				this.props.dispatch({ type : 'CURRENT_ONLINE_USERS', payload : response.onlineUsers })
 				this.props.dispatch({ type : 'LOADED' })
-			})
-
-			socket.on('client:onlineUsers', response => {
-				this.props.dispatch({ type : 'CURRENT_ONLINE_USERS', payload : response })
-				// this.props.dispatch({ type : 'LOADED' })
 			})
 
 			socket.on('client:userLeft', response => {
 				this.props.dispatch({ type : 'CURRENT_ONLINE_USERS', payload : response })
-				// this.props.dispatch({ type : 'LOADED' })
 			})
 			
 			window.addEventListener('beforeunload', event => {
 				event.preventDefault()
 				socket.emit('server:disconnect', sessionId, { room : 'GENERAL', user: sessionId })
 			})
-
 
 		})
 	}
@@ -71,15 +66,6 @@ class Index extends Component {
 				console.log("Got message", data.user, sessionId, data.message)
 				this.props.dispatch({ type : 'ADD_THREAD', payload : data })
 			})
-			socket.on('client:onlineUsers', response => {
-				this.props.dispatch({ type : 'CURRENT_ONLINE_USERS', payload : response })
-				// this.props.dispatch({ type : 'LOADED' })
-			})
-
-			socket.on('client:userLeft', response => {
-				this.props.dispatch({ type : 'CURRENT_ONLINE_USERS', payload : response })
-				// this.props.dispatch({ type : 'LOADED' })
-			})
 		})
 		return (
 			(this.props.loading) 
@@ -90,14 +76,20 @@ class Index extends Component {
 						<PreLoader color="green"/>
 					</div>
 				:	<div>
-						<Navbar/>
+						<Navbar socket={socket}/>
 						<div className="row">
-							<div className="col s9">
+							<div className="card-panel col s9">
 								<ChatMessages/>
-								<ChatBox/>
 							</div>
 							<div className="col s3">
 								<OnlineUsers/>
+							</div>
+						</div>
+						<div className="bottom-stick card-panel teal lighten-5">
+							<div className="col s10">
+								<ChatBox/>
+							</div>
+							<div className="col s2">
 								<LeaveChat socket={socket}/>
 							</div>
 						</div>

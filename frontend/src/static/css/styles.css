@@ -15,6 +15,7 @@
 
 .bottom-stick {
 	position: fixed;
-	bottom: 0;
-	width: inherit;
+	bottom: -1vh;
+	width: 100%;
+	margin-bottom: -1vh; 
 }

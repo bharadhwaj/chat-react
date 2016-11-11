@@ -13,19 +13,16 @@ class LeaveChat extends Component {
 		const { socket, username } = this.props
 		socket.emit('server:disconnect', username, { room : 'GENERAL', user: username })
 	}
-
-	componentWillUnmount() {
-		const { socket, username } = this.props
-		socket.emit('server:disconnect', username, { room : 'GENERAL', user: username })
-	}
-
 	render() {		
 		return (
-			<div className="bottom-stick row">
-				<button onClick={this.leaveChat.bind(this)} className="btn btn-large waves-effect waves-light">
-					Leave Chat<i className="material-icons right">send</i>
-				</button>
-			</div>
+			<div class="fixed-action-btn vertical click-to-toggle">
+				<a class="btn-floating btn-large teal">
+					<i class="material-icons">menu</i>
+				</a>
+				<ul>
+					<li><a onClick={this.leaveChat.bind(this)} class="btn-floating red"><i class="material-icons">exit_to_app</i></a></li>
+				</ul>
+ 			</div>
 		)
 	}
 }
