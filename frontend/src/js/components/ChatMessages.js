@@ -16,7 +16,7 @@ class ChatMessages extends Component {
 				? <li className="collection-item right-align" key={id}>{thread.message} : <b> Me </b></li>
 				: <li className="collection-item" key={id}><b>Him</b> : {thread.message}</li>
 		)
-		console.log('CHAT THREADS', chatThreads, username)
+		console.log('CHAT THREADS -- EMPTY ARRAY', chatThreads, username)
 		return (
 			<div className="row">
 				<div className="col s12">

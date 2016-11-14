@@ -1,6 +1,7 @@
 export default function reducer(state = { 
 	chat : [ ],
 	username : null,
+	roomName : 'GENERAL',
 	onlineUsers : [ ]
 }, action) {
 	
@@ -19,6 +20,15 @@ export default function reducer(state = {
 				onlineUsers : action.payload,
 			}
 		}
+
+		case "CURRENT_ROOMNAME": {
+			return {
+				...state,
+				roomName : action.payload,
+			}
+		}
+
+		
 
 		case "SET_USERNAME": {
 			return {

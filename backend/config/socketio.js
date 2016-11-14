@@ -18,7 +18,8 @@ module.exports = (app, server) => {
 			if (client) {
 				socket.room = roomName
 				socket.user = userName
-				clientArray.push(userName)
+				if (roomName === 'GENERAL')
+					clientArray.push(userName)
 				socket.join(roomName)
 				var response = {
 					status : 'SUCCESS',
@@ -28,6 +29,7 @@ module.exports = (app, server) => {
 					onlineUsers : clientArray,
 				}
 				socket.emit('client:joinRoomSuccess', response)
+				socket.broadcast.to(roomName).emit('client:userJoined', response.onlineUsers)
 			} else {
 				var response = {
 					status : 'FAILED',
@@ -51,7 +53,8 @@ module.exports = (app, server) => {
 			} else {
 				socket.room = roomName
 				socket.user = userName
-				clientArray.push(userName)
+				if (roomName === 'GENERAL')
+					clientArray.push(userName)
 				socket.join(roomName)
 				var response = {
 					status : 'SUCCESS',
@@ -61,6 +64,7 @@ module.exports = (app, server) => {
 					onlineUsers : clientArray
 				}
 				socket.emit('client:createRoomSuccess', response)
+				socket.broadcast.to(roomName).emit('client:userJoined', response.onlineUsers)
 			}
 		})
 
@@ -74,9 +78,10 @@ module.exports = (app, server) => {
 		socket.on('server:disconnect', function (session, data) {
 			console.log('DISCONNECT REQUEST')
 			console.log(socket.room, socket.user)
+			console.log('ROOOOOOMS', io.sockets.adapter.rooms)
 			var userName = data.user
 			var roomName = data.room
-			if(userName && roomName)
+			if(io.sockets.adapter.rooms[roomName])
 				delete io.sockets.adapter.rooms[roomName][userName]
 			clientArray = clientArray.filter(user => user !== userName)
 			socket.broadcast.to(roomName).emit('client:userLeft', clientArray)

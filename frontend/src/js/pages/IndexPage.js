@@ -15,36 +15,44 @@ let sessionId = null
 @connect((store) => {
 	return {
 		loading : store.pageReducer.loading,
+		roomName : store.chatReducer.roomName,
 	}
 })
 class Index extends Component {
 	componentWillMount() {
+		const { roomName } = this.props
 		socket.on('connect', () => {
 			socket.emit('server:connect')
 			sessionId = socket.io.engine.id
 			localStorage.setItem('username', sessionId)
 			this.props.dispatch({ type : 'SET_USERNAME', payload : sessionId })
-			socket.emit('server:joinRoom', sessionId, { room : 'GENERAL', user: sessionId })
+			socket.emit('server:joinRoom', sessionId, { room : roomName, user: sessionId })
 
 			socket.on('client:joinRoomSuccess', response => {
 				console.log('Join Success :)', response)
 				this.props.dispatch({ type : 'CURRENT_ONLINE_USERS', payload : response.onlineUsers })
+				this.props.dispatch({ type : 'CURRENT_ROOMNAME', payload : response.roomName })
 				this.props.dispatch({ type : 'LOADED' })
 			})
 
 			socket.on('client:joinRoomFailure', response => {
-				socket.emit('server:createRoom', sessionId, { room : 'GENERAL', user: sessionId })
+				socket.emit('server:createRoom', sessionId, { room : roomName, user: sessionId })
 			})
 
 			socket.on('client:createRoomFailure', response => {
-				socket.emit('server:joinRoom', sessionId, { room : 'GENERAL', user: sessionId })
+				socket.emit('server:joinRoom', sessionId, { room : roomName, user: sessionId })
 				console.log('Create Failed :(', response)
 			})
 
 			socket.on('client:createRoomSuccess', response => {
 				console.log('Create Success :)', response)
 				this.props.dispatch({ type : 'CURRENT_ONLINE_USERS', payload : response.onlineUsers })
+				this.props.dispatch({ type : 'CURRENT_ROOMNAME', payload : response.roomName })
 				this.props.dispatch({ type : 'LOADED' })
+			})
+
+			socket.on('client:userJoined', response => {
+				this.props.dispatch({ type : 'CURRENT_ONLINE_USERS', payload : response })
 			})
 
 			socket.on('client:userLeft', response => {
@@ -53,7 +61,7 @@ class Index extends Component {
 			
 			window.addEventListener('beforeunload', event => {
 				event.preventDefault()
-				socket.emit('server:disconnect', sessionId, { room : 'GENERAL', user: sessionId })
+				socket.emit('server:disconnect', sessionId, { room : roomName, user: sessionId })
 			})
 
 		})
@@ -67,9 +75,10 @@ class Index extends Component {
 				this.props.dispatch({ type : 'ADD_THREAD', payload : data })
 			})
 		})
+		console.log('CURRENT ROOM : ', this.props.roomName)
 		return (
 			(this.props.loading) 
-				? 	<div className="preloader-wrapper big active">
+				? 	<div className="loader-class preloader-wrapper big active">
 						<PreLoader color="blue"/>
 						<PreLoader color="red"/>
 						<PreLoader color="yellow"/>
@@ -82,14 +91,14 @@ class Index extends Component {
 								<ChatMessages/>
 							</div>
 							<div className="col s3">
-								<OnlineUsers/>
+								<OnlineUsers socket={socket} sessionId={sessionId}/>
 							</div>
 						</div>
-						<div className="bottom-stick card-panel teal lighten-5">
-							<div className="col s10">
+						<div className="bottom-stick row card-panel teal lighten-5">
+							<div className="col m11">
 								<ChatBox/>
 							</div>
-							<div className="col s2">
+							<div className="col m1">
 								<LeaveChat socket={socket}/>
 							</div>
 						</div>

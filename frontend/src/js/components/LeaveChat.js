@@ -15,7 +15,7 @@ class LeaveChat extends Component {
 	}
 	render() {		
 		return (
-			<div class="fixed-action-btn vertical click-to-toggle">
+			<div style={{ marginBottom : 10 }} class="fixed-action-btn vertical click-to-toggle">
 				<a class="btn-floating btn-large teal">
 					<i class="material-icons">menu</i>
 				</a>

@@ -9,6 +9,7 @@ const socket = io('http://localhost:3000')
 	return {
 		chatMessages : store.chatReducer.chat,
 		username : store.chatReducer.username,
+		roomName : store.chatReducer.roomName,
 	}
 })
 class ChatBox extends Component {
@@ -19,9 +20,11 @@ class ChatBox extends Component {
 
 	emitMessage(event) {
 		event.preventDefault()
-		if (this.state.message.trim()) {
-			console.log('Got From Text Box',this.props.username, this.state.message)
-			socket.emit('server:newMessage', this.props.username, { message : this.state.message, user : this.props.username ,room : 'GENERAL' })
+		const { message } = this.state
+		const { username, roomName } = this.props
+		if (message.trim()) {
+			console.log('Got From Text Box', username, this.state.message)
+			socket.emit('server:newMessage', username, { message : message, user : username ,room : roomName })
 			this.setState({ message: '' })
 		}
 	}
