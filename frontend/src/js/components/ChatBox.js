@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import store from '../store'
 import io from 'socket.io-client'
 
-const socket = io('http://localhost:3000')
+const socket = io('http://localhost:4000')
 
 @connect((store) => {
 	return {

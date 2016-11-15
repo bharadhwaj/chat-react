@@ -9,7 +9,7 @@ import ChatBox from '../components/ChatBox'
 import OnlineUsers from '../components/OnlineUsers'
 import LeaveChat from '../components/LeaveChat'
 
-const socket = io('http://localhost:3000')
+const socket = io('http://localhost:4000')
 let sessionId = null
 
 @connect((store) => {
@@ -99,7 +99,7 @@ class Index extends Component {
 						</div>
 						<div className="bottom-stick row card-panel teal lighten-5">
 							<div className="col m11">
-								<ChatBox/>
+								<ChatBox socket={socket} sessionId={sessionId}/>
 							</div>
 							<div className="col m1">
 								<LeaveChat socket={socket} sessionId={sessionId}/>

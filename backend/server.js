@@ -6,16 +6,13 @@ var debug = require('debug')('pictionary:server')
 // var fs=require('fs')
 
 var env = process.env.NODE_ENV || 'development'
-  , config = require('./config/config')[env]
 
 
 var app = express()
-require('./config/express')(app, config)
-
-require('./config/routes')(app)
 
 
-var port = normalizePort(process.env.PORT || '3000');
+
+var port = normalizePort(process.env.PORT || '4000');
 app.set('port', port);
 
 var server = http.createServer(app);
