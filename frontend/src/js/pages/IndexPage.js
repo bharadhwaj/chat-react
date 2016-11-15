@@ -26,7 +26,12 @@ class Index extends Component {
 			sessionId = socket.io.engine.id
 			localStorage.setItem('username', sessionId)
 			this.props.dispatch({ type : 'SET_USERNAME', payload : sessionId })
-			socket.emit('server:joinRoom', sessionId, { room : roomName, user: sessionId })
+			socket.emit('server:joinRoomRequest', sessionId, { room : roomName, user: sessionId })
+
+			socket.on('client:joinRoomRequestSuccess', response => {
+				console.log('JOIN REQUEST SUCCESS')
+				socket.emit('server:joinRoom', sessionId, { room : roomName, user: sessionId })
+			})
 
 			socket.on('client:joinRoomSuccess', response => {
 				console.log('Join Success :)', response)
@@ -35,7 +40,7 @@ class Index extends Component {
 				this.props.dispatch({ type : 'LOADED' })
 			})
 
-			socket.on('client:joinRoomFailure', response => {
+			socket.on('client:joinRoomRequestFailure', response => {
 				socket.emit('server:createRoom', sessionId, { room : roomName, user: sessionId })
 			})
 
@@ -45,10 +50,7 @@ class Index extends Component {
 			})
 
 			socket.on('client:createRoomSuccess', response => {
-				console.log('Create Success :)', response)
-				this.props.dispatch({ type : 'CURRENT_ONLINE_USERS', payload : response.onlineUsers })
-				this.props.dispatch({ type : 'CURRENT_ROOMNAME', payload : response.roomName })
-				this.props.dispatch({ type : 'LOADED' })
+				socket.emit('server:joinRoom', sessionId, { room : roomName, user: sessionId })
 			})
 
 			socket.on('client:userJoined', response => {

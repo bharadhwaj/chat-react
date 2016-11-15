@@ -10,18 +10,20 @@ import { connect } from 'react-redux'
 class OnlineUsers extends Component {
 	createPrivateChat(currentUser) {
 		const { socket, username, sessionId } = this.props
-		const roomName =  username < currentUser 
-							? username + '-' + currentUser
-							: currentUser + '-' + username
+		const roomName = currentUser === 'GENERAL'
+							? 'GENERAL'
+							: username < currentUser 
+								? username + '-' + currentUser
+								: currentUser + '-' + username
 		console.log('NEW ROOM NAME', roomName)
 		socket.emit('server:createRoom', sessionId, { room : roomName, user: username })
 		socket.emit('server:joinRoom', sessionId, { room : roomName, user: username })
 		socket.emit('server:joinRoom', currentUser, { room : roomName, user: currentUser })
-
+		
 		socket.on('client:createRoomFailure', response => {
-			socket.emit('server:joinRoom', currentUser, { room : roomName, user: currentUser })
+			socket.emit('server:joinRoom', sessionId, { room : roomName, user: username })
 		})
-
+		
 		socket.on('client:joinRoomSuccess', response => {
 			this.props.dispatch({ type : 'CURRENT_ROOMNAME', payload : response.roomName })
 		})
@@ -33,6 +35,7 @@ class OnlineUsers extends Component {
 		return (
 			<ul class="collection with-header">
 				<li class="collection-header"><h5>Online Users</h5></li>
+				<li onClick={() => this.createPrivateChat('GENERAL')} className="collection-item">GENERAL</li>
 				{onlineList}
 			</ul>
 		)
