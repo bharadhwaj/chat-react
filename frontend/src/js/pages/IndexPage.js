@@ -58,6 +58,7 @@ class Index extends Component {
 			})
 
 			socket.on('client:userLeft', response => {
+				console.log('USER LEFT')
 				this.props.dispatch({ type : 'CURRENT_ONLINE_USERS', payload : response })
 			})
 			
@@ -101,7 +102,7 @@ class Index extends Component {
 								<ChatBox/>
 							</div>
 							<div className="col m1">
-								<LeaveChat socket={socket}/>
+								<LeaveChat socket={socket} sessionId={sessionId}/>
 							</div>
 						</div>
 					</div>

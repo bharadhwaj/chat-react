@@ -15,10 +15,21 @@ class OnlineUsers extends Component {
 							: username < currentUser 
 								? username + '-' + currentUser
 								: currentUser + '-' + username
+								
 		console.log('NEW ROOM NAME', roomName)
+
 		socket.emit('server:createRoom', sessionId, { room : roomName, user: username })
-		socket.emit('server:joinRoom', sessionId, { room : roomName, user: username })
-		socket.emit('server:joinRoom', currentUser, { room : roomName, user: currentUser })
+
+		socket.on('client:createRoomFailure', response => {
+			socket.emit('server:joinRoom', sessionId, { room : roomName, user: username })
+			socket.emit('server:joinRoom', currentUser, { room : roomName, user: currentUser })
+			console.log('Create Failed :(', response)
+		})
+
+		socket.on('client:createRoomSuccess', response => {
+			socket.emit('server:joinRoom', sessionId, { room : roomName, user: username })
+			socket.emit('server:joinRoom', currentUser, { room : roomName, user: currentUser })
+		})		
 		
 		socket.on('client:createRoomFailure', response => {
 			socket.emit('server:joinRoom', sessionId, { room : roomName, user: username })

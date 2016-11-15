@@ -19,7 +19,7 @@ module.exports = (app, server) => {
 					status : 'SUCCESS',
 					message : 'Join room request successful.',
 				}
-				console.log('CURRENT CLIENT :',clients)
+				console.log('CURRENT CLIENT REQUEST:',clients)
 				socket.emit('client:joinRoomRequestSuccess', response)
 			} else {
 				console.log('JOIN FAILED')
@@ -81,26 +81,17 @@ module.exports = (app, server) => {
 		socket.on('server:disconnect', function (session, data) {
 			console.log('DISCONNECT REQUEST')
 			console.log(socket.room, socket.user)
-			console.log('ROOOOOOMS', io.sockets.adapter.rooms)
-			var userName = data.user
-			var roomName = data.room
+			console.log('ROOMS', io.sockets.adapter.rooms)
+			var userName = socket.user
+			var roomName = socket.room
 			socket.leave(userName)
+			delete io.sockets.adapter.rooms[roomName][userName]
 			var clients = io.sockets.adapter.rooms[roomName]
-			console.log('DICTIONARY CLIENT',clients)
+			console.log('ALL ROOMS',io.sockets.adapter.rooms)
 			var client =  Object.keys(clients)
 			socket.broadcast.to(roomName).emit('client:userLeft', client)
 		})
 
-		socket.on('drawLine', function(data, session ) {
-			if(socket.room) {
-				var room=socket.room;
-				console.log('Room Name is '+room)
-				socket.broadcast.to(room).emit('drawLine',data);
-			} else {
-				var error="Unauthorized access.";
-				socket.emit('displayerror',error);
-			}
-		})
-	});
+	})
 
 }

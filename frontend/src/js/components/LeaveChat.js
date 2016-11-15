@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 
 @connect((store) => {
 	return {
+		roomName : store.chatReducer.roomName,
 		username : store.chatReducer.username,
 	}
 })
@@ -10,8 +11,9 @@ class LeaveChat extends Component {
 
 	leaveChat() {
 		console.log('INSIDE LEAVE CHAT')
-		const { socket, username } = this.props
-		socket.emit('server:disconnect', username, { room : 'GENERAL', user: username })
+		const { socket, sessionId, username, roomName } = this.props
+		socket.emit('server:disconnect', sessionId, { room : roomName, user: username })
+		console.log('SENT DISCONNECT REQUEST')
 	}
 	render() {		
 		return (
