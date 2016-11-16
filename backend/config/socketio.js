@@ -82,7 +82,7 @@ module.exports = (app, server) => {
 			socket.broadcast.to(roomName).emit('client:newMessage', data)
 		})
 
-		socket.on('server:disconnect', function (session, data) {
+		socket.on('server:disconnect', (session, data) => {
 			console.log('DISCONNECT REQUEST')
 			console.log(socket.room, socket.user)
 			console.log('ROOMS', io.sockets.adapter.rooms)

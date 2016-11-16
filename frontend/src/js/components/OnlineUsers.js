@@ -8,7 +8,8 @@ import { connect } from 'react-redux'
 	}
 })
 class OnlineUsers extends Component {
-	createPrivateChat(currentUser) {
+
+	joinPrivateChat(currentUser) {
 		const { socket, username, sessionId } = this.props
 		const roomName = currentUser === 'GENERAL'
 							? 'GENERAL'
@@ -21,7 +22,7 @@ class OnlineUsers extends Component {
 		socket.emit('server:createRoom', sessionId, { room : roomName, user: username })
 
 		socket.on('client:createRoomFailure', response => {
-			socket.emit('server:joinRoom', response.userName, { room : response.roomName, user: response.userName })
+			socket.emit('server:joinRoom', sessionId, { room : roomName, user: username })
 			console.log('Create Failed :(', response)
 		})
 
@@ -40,11 +41,11 @@ class OnlineUsers extends Component {
 	render() {
 		const { onlineUsers } = this.props 
 		console.log('ALL USERS', onlineUsers)
-		const onlineList = onlineUsers.map((user, id) => <li onClick={() => this.createPrivateChat(user)} key={id} className="collection-item">{user}</li>)
+		const onlineList = onlineUsers.map((user, id) => <li onClick={() => this.joinPrivateChat(user)} key={id} className="collection-item">{user}</li>)
 		return (
 			<ul class="collection with-header">
 				<li class="collection-header"><h5>Channels</h5></li>
-				<li onClick={() => this.createPrivateChat('GENERAL')} className="collection-item">GENERAL</li>
+				<li onClick={() => this.joinPrivateChat('GENERAL')} className="collection-item">GENERAL</li>
 				<li class="collection-header"><h5>Online Users</h5></li>
 				{onlineList}
 			</ul>

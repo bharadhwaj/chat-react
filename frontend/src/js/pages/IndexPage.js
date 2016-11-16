@@ -16,6 +16,7 @@ let sessionId = null
 	return {
 		loading : store.pageReducer.loading,
 		roomName : store.chatReducer.roomName,
+		onlineUsers : store.chatReducer.onlineUsers,
 	}
 })
 class Index extends Component {
@@ -68,6 +69,7 @@ class Index extends Component {
 			})
 
 		})
+
 	}
 
 
