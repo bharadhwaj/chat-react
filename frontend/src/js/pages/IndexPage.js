@@ -30,7 +30,7 @@ class Index extends Component {
 
 			socket.on('client:joinRoomRequestSuccess', response => {
 				console.log('JOIN REQUEST SUCCESS')
-				socket.emit('server:joinRoom', sessionId, { room : roomName, user: sessionId })
+				socket.emit('server:joinRoom', sessionId, { room : response.roomName, user: response.userName })
 			})
 
 			socket.on('client:joinRoomSuccess', response => {
@@ -45,7 +45,7 @@ class Index extends Component {
 			})
 
 			socket.on('client:createRoomFailure', response => {
-				socket.emit('server:joinRoom', sessionId, { room : roomName, user: sessionId })
+				socket.emit('server:joinRoom', sessionId, { room : response.roomName, user: response.userName })
 				console.log('Create Failed :(', response)
 			})
 
@@ -73,9 +73,9 @@ class Index extends Component {
 
 	render() {
 		socket.on('connect', () => {
-			socket.on('client:newMessage', data => {
-				console.log("Got message", data.user, sessionId, data.message)
-				this.props.dispatch({ type : 'ADD_THREAD', payload : data })
+			socket.on('client:newMessage', response => {
+				console.log("Got message", response.user, sessionId, response.message)
+				this.props.dispatch({ type : 'ADD_THREAD', payload : response })
 			})
 		})
 		console.log('CURRENT ROOM : ', this.props.roomName)

@@ -13,11 +13,13 @@ module.exports = (app, server) => {
 			var roomName = data.room
 			var userName = data.user
 			console.log('JOIN ROOM REQUEST: User', userName, 'asked to join Room :', roomName, 'with Session ID:',session)
-			var clients = io.sockets.adapter.rooms[roomName]
+			var clients = io.sockets.adapter.rooms['GENERAL']
 			if (clients) {
 				var response = {
 					status : 'SUCCESS',
 					message : 'Join room request successful.',
+					roomName : roomName,
+					userName : userName,
 				}
 				console.log('CURRENT CLIENT REQUEST:',clients)
 				socket.emit('client:joinRoomRequestSuccess', response)
@@ -35,11 +37,13 @@ module.exports = (app, server) => {
 			var roomName = data.room
 			var userName = data.user
 			console.log('CREATE ROOM REQUEST: User', userName, 'created new Room :', roomName, 'with Session ID:',session)
-			var clients = io.sockets.adapter.rooms[roomName]
+			var clients = io.sockets.adapter.rooms['GENERAL']
 			if (clients) {
 				var response = {
 					status : 'FAILED',
-					message : 'Room already exists . Please create a new room.'
+					message : 'Room already exists . Please create a new room.',
+					roomName : roomName,
+					userName : userName,
 				}
 				socket.emit('client:createRoomFailure', response)
 			} else {
@@ -57,7 +61,7 @@ module.exports = (app, server) => {
 			socket.room = roomName
 			socket.user = userName
 			socket.join(roomName)
-			var client = Object.keys(io.sockets.adapter.rooms[roomName])
+			var client = Object.keys(io.sockets.adapter.rooms['GENERAL'])
 			var response = {
 				status : 'SUCCESS',
 				message : 'Joined room successfully.',
