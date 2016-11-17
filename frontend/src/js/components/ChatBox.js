@@ -1,9 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import store from '../store'
-import io from 'socket.io-client'
-
-const socket = io('http://localhost:4000')
 
 @connect((store) => {
 	return {
@@ -21,10 +18,10 @@ class ChatBox extends Component {
 	emitMessage(event) {
 		event.preventDefault()
 		const { message } = this.state
-		const { username, roomName } = this.props
+		const { socket, username, roomName } = this.props
 		if (message.trim()) {
 			console.log('Got From Text Box', username, this.state.message)
-			socket.emit('server:newMessage', username, { message : message, user : username ,room : roomName })
+			socket.emit('server:newMessage', { message : message, user : username ,room : roomName })
 			this.setState({ message: '' })
 		}
 	}

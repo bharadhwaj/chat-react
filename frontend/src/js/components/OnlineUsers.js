@@ -8,44 +8,41 @@ import { connect } from 'react-redux'
 	}
 })
 class OnlineUsers extends Component {
+	
+	createPrivateChat(roomName, userName) {
+		const { socket } = this.props
+		console.log('INSIDE CREATE PRIVATE CHAT', roomName, userName)
+		socket.emit('server:createRoom', { room : roomName, user: userName })
+		this.joinPrivateChat(roomName, userName)
+	}
 
-	joinPrivateChat(currentUser) {
-		const { socket, username, sessionId } = this.props
+	joinPrivateChat(roomName, userName) {
+		const { socket } = this.props
+		console.log('INSIDE JOIN PRIVATE CHAT', roomName, userName)
+		socket.emit('server:joinRoom', { room : roomName, user: userName })
+	}
+
+	privateChat(currentUser) {
+		const { socket, username } = this.props
 		const roomName = currentUser === 'GENERAL'
 							? 'GENERAL'
 							: username < currentUser 
 								? username + '-' + currentUser
 								: currentUser + '-' + username
 
-		console.log('NEW ROOM NAME', roomName)
-
-		socket.emit('server:createRoom', sessionId, { room : roomName, user: username })
-
-		socket.on('client:createRoomFailure', response => {
-			socket.emit('server:joinRoom', sessionId, { room : roomName, user: username })
-			console.log('Create Failed :(', response)
-		})
-
-		socket.on('client:createRoomSuccess', response => {
-			socket.emit('server:joinRoom', response.userName, { room : response.roomName, user: response.userName })
-		})		
-		
-		socket.on('client:createRoomFailure', response => {
-			socket.emit('server:joinRoom', response.userName, { room : response.roomName, user: response.userName })
-		})
-		
-		socket.on('client:joinRoomSuccess', response => {
-			this.props.dispatch({ type : 'CURRENT_ROOMNAME', payload : response.roomName })
-		})
+		console.log('NEW ROOM NAME', roomName, currentUser, username)
+		this.createPrivateChat(roomName, username)
+		this.createPrivateChat(roomName, currentUser)
 	}
+
 	render() {
 		const { onlineUsers } = this.props 
 		console.log('ALL USERS', onlineUsers)
-		const onlineList = onlineUsers.map((user, id) => <li onClick={() => this.joinPrivateChat(user)} key={id} className="collection-item">{user}</li>)
+		const onlineList = onlineUsers.map((user, id) => <li onClick={() => this.privateChat(user)} key={id} className="collection-item">{user}</li>)
 		return (
 			<ul class="collection with-header">
 				<li class="collection-header"><h5>Channels</h5></li>
-				<li onClick={() => this.joinPrivateChat('GENERAL')} className="collection-item">GENERAL</li>
+				<li onClick={() => this.privateChat('GENERAL')} className="collection-item">GENERAL</li>
 				<li class="collection-header"><h5>Online Users</h5></li>
 				{onlineList}
 			</ul>

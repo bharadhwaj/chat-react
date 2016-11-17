@@ -1,19 +1,18 @@
 module.exports = (app, server) => {
 
-	var clientArray = [ ]
 	var io = require('socket.io').listen(server)
 	global.io = io
-	
+	var allUserArray = [ ]
 	io.on('connection', socket => {
 		socket.on('server:connect', () => {
 			console.log('CONNECTION : Client joined.')
 		})
 
-		socket.on('server:joinRoomRequest', (session, data) => {
+		socket.on('server:joinRoomRequest', data => {
 			var roomName = data.room
 			var userName = data.user
-			console.log('JOIN ROOM REQUEST: User', userName, 'asked to join Room :', roomName, 'with Session ID:',session)
-			var clients = io.sockets.adapter.rooms['GENERAL']
+			console.log('JOIN ROOM REQUEST: User', userName, 'asked to join Room :', roomName)
+			var clients = io.sockets.adapter.rooms[roomName]
 			if (clients) {
 				var response = {
 					status : 'SUCCESS',
@@ -21,7 +20,6 @@ module.exports = (app, server) => {
 					roomName : roomName,
 					userName : userName,
 				}
-				console.log('CURRENT CLIENT REQUEST:',clients)
 				socket.emit('client:joinRoomRequestSuccess', response)
 			} else {
 				console.log('JOIN FAILED')
@@ -33,67 +31,69 @@ module.exports = (app, server) => {
 			}
 		})
 
-		socket.on('server:createRoom', (session, data) => {
+		socket.on('server:createRoom', data => {
 			var roomName = data.room
 			var userName = data.user
-			console.log('CREATE ROOM REQUEST: User', userName, 'created new Room :', roomName, 'with Session ID:',session)
-			var clients = io.sockets.adapter.rooms['GENERAL']
+			var clients = io.sockets.adapter.rooms[roomName]
+			var response = { }
 			if (clients) {
-				var response = {
+				response = {
 					status : 'FAILED',
 					message : 'Room already exists . Please create a new room.',
 					roomName : roomName,
 					userName : userName,
 				}
-				socket.emit('client:createRoomFailure', response)
+				console.log('CREATE ROOM REQUEST: User', userName, 'failed to create Room :', roomName)
 			} else {
-				var response = {
+				response = {
 					status : 'SUCCESS',
 					message : 'Room created successfully.',
+					roomName : roomName,
+					userName : userName,
 				}
-				socket.emit('client:createRoomSuccess', response)
+				console.log('CREATE ROOM REQUEST: User', userName, 'created new Room :', roomName)
 			}
+			socket.emit('client:createRoomResponse', response)
+
 		})
 
-		socket.on('server:joinRoom', (session, data) => {
+		socket.on('server:joinRoom', data => {
 			var roomName = data.room
 			var userName = data.user
 			socket.room = roomName
 			socket.user = userName
 			socket.join(roomName)
-			var client = Object.keys(io.sockets.adapter.rooms['GENERAL'])
+			var allUserArray = Object.keys(io.sockets.adapter.rooms['GENERAL'])
+			var client = Object.keys(io.sockets.adapter.rooms[roomName])
 			var response = {
 				status : 'SUCCESS',
 				message : 'Joined room successfully.',
 				roomName : roomName,
 				userName : userName,
-				onlineUsers : client,
+				onlineUsers : allUserArray,
 			}
-			console.log('CURRENT CLIENT :',client)
+			console.log('CURRENT CLIENT ON',roomName,':',client)
 			socket.emit('client:joinRoomSuccess', response)
-			socket.broadcast.to(roomName).emit('client:userJoined', client)
+			socket.broadcast.to(roomName).emit('client:userJoined', allUserArray)
 			
 		})
 
-		socket.on('server:newMessage', (session, data) => {
+		socket.on('server:newMessage',  data => {
 			var roomName = data.room
 			console.log(data.user, ':', data.message ,'ON', data.room)
 			console.log("Room message", roomName)
-			socket.broadcast.to(roomName).emit('client:newMessage', data)
+			io.sockets.in(roomName).emit('client:newMessage', data)
 		})
 
-		socket.on('server:disconnect', (session, data) => {
+		socket.on('server:disconnect', data => {
 			console.log('DISCONNECT REQUEST')
 			console.log(socket.room, socket.user)
 			console.log('ROOMS', io.sockets.adapter.rooms)
-			var userName = socket.user
-			var roomName = socket.room
-			socket.leave(userName)
-			delete io.sockets.adapter.rooms[roomName][userName]
-			var clients = io.sockets.adapter.rooms[roomName]
-			console.log('ALL ROOMS',io.sockets.adapter.rooms)
-			var client =  Object.keys(clients)
-			socket.broadcast.to(roomName).emit('client:userLeft', client)
+			socket.user = data.user
+			socket.room = data.room
+			socket.leave(data.room)
+			allUserArray =  Object.keys(io.sockets.adapter.rooms['GENERAL'])
+			io.sockets.in(data.room).emit('client:userLeft', allUserArray)
 		})
 
 	})

@@ -11,11 +11,11 @@ class LeaveChat extends Component {
 
 	leaveChat() {
 		console.log('INSIDE LEAVE CHAT')
-		const { socket, sessionId, username, roomName } = this.props
-		socket.emit('server:disconnect', sessionId, { room : roomName, user: username })
+		const { socket, username, roomName } = this.props
+		socket.emit('server:disconnect', { room : roomName, user: username })
 		console.log('SENT DISCONNECT REQUEST')
 	}
-	render() {		
+	render() {
 		return (
 			<div style={{ marginBottom : 10 }} class="fixed-action-btn vertical click-to-toggle">
 				<a class="btn-floating btn-large teal">
