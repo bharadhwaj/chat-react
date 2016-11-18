@@ -31,13 +31,14 @@ class Index extends Component {
 
 			socket.on('client:joinRoomRequestSuccess', response => {
 				console.log('JOIN REQUEST SUCCESS')
-				socket.emit('server:joinRoom', { room : response.roomName, user: response.userName })
+				socket.emit('server:joinRoom', { room : response.roomName, user : response.userName, inviteJoin : false })
 			})
 
 			socket.on('client:joinRoomSuccess', response => {
 				console.log('Join Success :)', response)
 				this.props.dispatch({ type : 'CURRENT_ONLINE_USERS', payload : response.onlineUsers })
-				this.props.dispatch({ type : 'CURRENT_ROOMNAME', payload : response.roomName })
+				if(!response.inviteJoin)
+					this.props.dispatch({ type : 'CURRENT_ROOMNAME', payload : response.roomName })
 				this.props.dispatch({ type : 'LOADED' })
 			})
 
@@ -45,9 +46,15 @@ class Index extends Component {
 				socket.emit('server:createRoom',  { room : roomName, user: sessionId })
 			})
 
+			socket.on('client:askToJoinRoom', response => {
+				console.log('ASK TO JOIN', response)
+				if (sessionId === response.user)
+					socket.emit('server:joinRoom', { room : response.room, user: response.user, inviteJoin : true })
+			})
+
 			socket.on('client:createRoomResponse', response => {
 				console.log('CREATE ROOM RESPONSE', response)
-				socket.emit('server:joinRoom', { room : response.roomName, user: response.userName })
+				socket.emit('server:joinRoom', { room : response.roomName, user: response.userName, inviteJoin : false })
 			})
 
 			socket.on('client:userJoined', response => {

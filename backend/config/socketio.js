@@ -31,6 +31,11 @@ module.exports = (app, server) => {
 			}
 		})
 
+		socket.on('server:askToJoinRoom', data => {
+			console.log('ASK TO JOIN REQUEST: ', data)
+			io.sockets.in('GENERAL').emit('client:askToJoinRoom', data)
+		})
+
 		socket.on('server:createRoom', data => {
 			var roomName = data.room
 			var userName = data.user
@@ -71,6 +76,7 @@ module.exports = (app, server) => {
 				roomName : roomName,
 				userName : userName,
 				onlineUsers : allUserArray,
+				inviteJoin : data.inviteJoin,
 			}
 			console.log('CURRENT CLIENT ON',roomName,':',client)
 			socket.emit('client:joinRoomSuccess', response)

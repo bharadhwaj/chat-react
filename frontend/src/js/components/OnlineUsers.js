@@ -13,13 +13,12 @@ class OnlineUsers extends Component {
 		const { socket } = this.props
 		console.log('INSIDE CREATE PRIVATE CHAT', roomName, userName)
 		socket.emit('server:createRoom', { room : roomName, user: userName })
-		this.joinPrivateChat(roomName, userName)
 	}
 
-	joinPrivateChat(roomName, userName) {
+	askToJoinPrivateChat(roomName, userName) {
 		const { socket } = this.props
 		console.log('INSIDE JOIN PRIVATE CHAT', roomName, userName)
-		socket.emit('server:joinRoom', { room : roomName, user: userName })
+		socket.emit('server:askToJoinRoom', { room : roomName, user: userName })
 	}
 
 	privateChat(currentUser) {
@@ -32,7 +31,7 @@ class OnlineUsers extends Component {
 
 		console.log('NEW ROOM NAME', roomName, currentUser, username)
 		this.createPrivateChat(roomName, username)
-		this.createPrivateChat(roomName, currentUser)
+		this.askToJoinPrivateChat(roomName, currentUser)
 	}
 
 	render() {
