@@ -10,8 +10,8 @@ import { connect } from 'react-redux'
 })
 class ChatMessages extends Component {
 	render() {
+		
 		const { chatMessages, username, roomName } = this.props
-
 		const chatThreads = chatMessages.filter(thread => thread.room === roomName)
 		.map((thread, id) =>
 			thread.user === username

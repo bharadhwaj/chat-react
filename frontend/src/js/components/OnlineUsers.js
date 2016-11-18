@@ -5,6 +5,8 @@ import { connect } from 'react-redux'
 	return {
 		onlineUsers : store.chatReducer.onlineUsers,
 		username : store.chatReducer.username,
+		roomName : store.chatReducer.roomName,
+		chat : store.chatReducer.chat
 	}
 })
 class OnlineUsers extends Component {
@@ -35,16 +37,28 @@ class OnlineUsers extends Component {
 	}
 
 	render() {
-		const { onlineUsers } = this.props 
-		console.log('ALL USERS', onlineUsers)
-		const onlineList = onlineUsers.map((user, id) => <li onClick={() => this.privateChat(user)} key={id} className="collection-item">{user}</li>)
+		this.props.dispatch({ type : 'MARK_READ', payload : roomName})
+		
+		let unreadMessage = [ ]
+		const { onlineUsers, chat, roomName } = this.props 
+		for (let thread of chat) {
+			if (!unreadMessage[thread.room]) {
+				unreadMessage[thread.room] = 0
+			}
+			if (thread.read === false ) {
+				unreadMessage[thread.room] += 1
+			}
+		}
+
+		console.log('ALL USERS', onlineUsers, unreadMessage)
+		const onlineList = onlineUsers.map((user, id) => <a style={{ cursor : 'pointer' }} onClick={() => this.privateChat(user)} key={id} className="collection-item">{user}<span class="new badge">1</span></a>)
 		return (
-			<ul class="collection with-header">
-				<li class="collection-header"><h5>Channels</h5></li>
-				<li onClick={() => this.privateChat('GENERAL')} className="collection-item">GENERAL</li>
-				<li class="collection-header"><h5>Online Users</h5></li>
+			<div class="collection with-header">
+				<div class="collection-header"><h5>Channels</h5></div>
+				<a style={{ cursor : 'pointer' }} onClick={() => this.privateChat('GENERAL')} className="collection-item">GENERAL{unreadMessage['GENERAL'] && <span class="new badge">{unreadMessage['GENERAL']}</span>}</a>
+				<div class="collection-header"><h5>Online Users</h5></div>
 				{onlineList}
-			</ul>
+			</div>
 		)
 	}
 }

@@ -2,7 +2,7 @@ export default function reducer(state = {
 	chat : [ ],
 	username : null,
 	roomName : 'GENERAL',
-	onlineUsers : [ ]
+	onlineUsers : [ ],
 }, action) {
 	
 	switch(action.type) {
@@ -27,9 +27,7 @@ export default function reducer(state = {
 				roomName : action.payload,
 			}
 		}
-
 		
-
 		case "SET_USERNAME": {
 			return {
 				...state,
@@ -37,6 +35,13 @@ export default function reducer(state = {
 			}
 		}
 
+		// case "MARK_READ": {
+		// 	return {
+		// 		...state,
+		// 		chat : [...state.chat.map(thread => { if (thread.room === action.payload) {thread.read = true} return thread }) ]
+		// 	}
+		// }
+		
 		default: {
 			return {...state}
 		}

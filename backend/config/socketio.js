@@ -86,6 +86,7 @@ module.exports = (app, server) => {
 
 		socket.on('server:newMessage',  data => {
 			var roomName = data.room
+			data.read = false
 			console.log(data.user, ':', data.message ,'ON', data.room)
 			console.log("Room message", roomName)
 			io.sockets.in(roomName).emit('client:newMessage', data)
