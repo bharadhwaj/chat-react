@@ -22,15 +22,20 @@ class OnlineUsers extends Component {
 		console.log('INSIDE JOIN PRIVATE CHAT', roomName, userName)
 		socket.emit('server:askToJoinRoom', { room : roomName, user: userName })
 	}
-
-	privateChat(currentUser) {
-		const { socket, username } = this.props
-		const roomName = currentUser === 'GENERAL'
+	
+	getRoomName(currentUser) {
+		const { username } = this.props
+		return currentUser === 'GENERAL'
 							? 'GENERAL'
 							: username < currentUser 
 								? username + '-' + currentUser
 								: currentUser + '-' + username
 
+	}
+
+	privateChat(currentUser) {
+		const { socket, username } = this.props
+		const roomName = this.getRoomName(currentUser) 
 		console.log('NEW ROOM NAME', roomName, currentUser, username)
 		this.createPrivateChat(roomName, username)
 		this.askToJoinPrivateChat(roomName, currentUser)
@@ -40,8 +45,9 @@ class OnlineUsers extends Component {
 		this.props.dispatch({ type : 'MARK_READ', payload : roomName})
 		
 		let unreadMessage = [ ]
-		const { onlineUsers, chat, roomName } = this.props 
+		const { onlineUsers, chat, username, roomName } = this.props 
 		for (let thread of chat) {
+			console.log('THREAD ROOMS: ', thread)
 			if (!unreadMessage[thread.room]) {
 				unreadMessage[thread.room] = 0
 			}
@@ -51,7 +57,9 @@ class OnlineUsers extends Component {
 		}
 
 		console.log('ALL USERS', onlineUsers, unreadMessage)
-		const onlineList = onlineUsers.map((user, id) => <a style={{ cursor : 'pointer' }} onClick={() => this.privateChat(user)} key={id} className="collection-item">{user}<span class="new badge">1</span></a>)
+		const onlineList = onlineUsers
+							.filter(user => user !== username)
+							.map((user, id) => <a style={{ cursor : 'pointer' }} onClick={() => this.privateChat(user)} key={id} className="collection-item">{user}{unreadMessage[this.getRoomName(user)] && <span class="new badge">{unreadMessage[this.getRoomName(user)]}</span>}</a>)
 		return (
 			<div class="collection with-header">
 				<div class="collection-header"><h5>Channels</h5></div>

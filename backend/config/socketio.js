@@ -99,8 +99,12 @@ module.exports = (app, server) => {
 			socket.user = data.user
 			socket.room = data.room
 			socket.leave(data.room)
-			allUserArray =  Object.keys(io.sockets.adapter.rooms['GENERAL'])
-			io.sockets.in(data.room).emit('client:userLeft', allUserArray)
+			if(io.sockets.adapter.rooms['GENERAL']) {
+				allUserArray =  Object.keys(io.sockets.adapter.rooms['GENERAL'])
+				io.sockets.in(data.room).emit('client:userLeft', allUserArray)
+			} else {
+				io.sockets.in(data.room).emit('client:userLeft', [ ])
+			}
 		})
 
 	})
