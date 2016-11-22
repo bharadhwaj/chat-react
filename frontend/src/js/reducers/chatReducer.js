@@ -35,12 +35,12 @@ export default function reducer(state = {
 			}
 		}
 
-		// case "MARK_READ": {
-		// 	return {
-		// 		...state,
-		// 		chat : [...state.chat.map(thread => { if (thread.room === action.payload) { thread.read = true } return thread }) ]
-		// 	}
-		// }
+		case "MARK_READ": {
+			return {
+				...state,
+				chat : [...state.chat.map(thread => { if (thread.room === action.payload) { thread.read = true; } return thread }) ]
+			}
+		}
 		
 		default: {
 			return {...state}

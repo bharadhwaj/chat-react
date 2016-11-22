@@ -10,6 +10,10 @@ import { connect } from 'react-redux'
 	}
 })
 class OnlineUsers extends Component {
+
+	componentWillMount() {
+		const { roomName } = this.props 
+	}
 	
 	createPrivateChat(roomName, userName) {
 		const { socket } = this.props
@@ -34,24 +38,26 @@ class OnlineUsers extends Component {
 	}
 
 	privateChat(currentUser) {
-		const { socket, username } = this.props
-		const roomName = this.getRoomName(currentUser) 
-		console.log('NEW ROOM NAME', roomName, currentUser, username)
-		this.createPrivateChat(roomName, username)
-		this.askToJoinPrivateChat(roomName, currentUser)
+
+		const { socket, username, roomName } = this.props
+		const newRoomName = this.getRoomName(currentUser) 
+		console.log('NEW ROOM NAME', newRoomName, currentUser, username)
+		this.createPrivateChat(newRoomName, username)
+		this.askToJoinPrivateChat(newRoomName, currentUser)
+		this.props.dispatch({ type : 'MARK_READ', payload : roomName})
 	}
 
 	render() {
-		this.props.dispatch({ type : 'MARK_READ', payload : roomName})
 		
 		let unreadMessage = [ ]
 		const { onlineUsers, chat, username, roomName } = this.props 
+
 		for (let thread of chat) {
 			console.log('THREAD ROOMS: ', thread)
 			if (!unreadMessage[thread.room]) {
 				unreadMessage[thread.room] = 0
 			}
-			if (thread.read === false ) {
+			if (thread.read === false && thread.user !== username && thread.room !== roomName) {
 				unreadMessage[thread.room] += 1
 			}
 		}
@@ -59,11 +65,11 @@ class OnlineUsers extends Component {
 		console.log('ALL USERS', onlineUsers, unreadMessage)
 		const onlineList = onlineUsers
 							.filter(user => user !== username)
-							.map((user, id) => <a style={{ cursor : 'pointer' }} onClick={() => this.privateChat(user)} key={id} className="collection-item">{user}{unreadMessage[this.getRoomName(user)] && <span class="new badge">{unreadMessage[this.getRoomName(user)]}</span>}</a>)
+							.map((user, id) => <a style={{ cursor : 'pointer' }} onClick={() => this.privateChat(user)} key={id} className="collection-item">{user}{unreadMessage[this.getRoomName(user)] ? <span class="new badge">{unreadMessage[this.getRoomName(user)]}</span> : null}</a>)
 		return (
 			<div class="collection with-header">
 				<div class="collection-header"><h5>Channels</h5></div>
-				<a style={{ cursor : 'pointer' }} onClick={() => this.privateChat('GENERAL')} className="collection-item">GENERAL{unreadMessage['GENERAL'] && <span class="new badge">{unreadMessage['GENERAL']}</span>}</a>
+				<a style={{ cursor : 'pointer' }} onClick={() => this.privateChat('GENERAL')} className="collection-item">GENERAL{unreadMessage['GENERAL'] ? <span class="new badge">{unreadMessage['GENERAL']}</span> : null}</a>
 				<div class="collection-header"><h5>Online Users</h5></div>
 				{onlineList}
 			</div>
